@@ -85,10 +85,10 @@ Paper values are from Wu et al., IEEE TWC 2026.
 | Claim | Paper | Ours | Verdict |
 |---|---|---|---|
 | Mean visible LEOs after screening | 2.73 | 2.73 | reproduced |
-| MSR-NAC beats NAC in every domain | yes | yes (-6.9% over training, -9.0% at end) | reproduced |
+| MSR-NAC beats NAC in every domain | yes | overall yes (-9.0% at end); per domain 6/6 on Linux, 5/6 on Windows | mostly |
 | CDLL beats single-domain ELLA | most domains | 5 of 6 domains | reproduced |
 | Up to 70% lower AoI/energy | up to 70% | largest gap ~18% | not reproduced |
-| Convergence speedup vs NAC | > 8x | 0.61x (CDLL), 2.5x (MSR-NAC) | not reproduced |
+| Convergence speedup vs NAC | > 8x | CDLL 0.61x (Linux) / 1.10x (Windows), MSR-NAC ~2.4x | not reproduced |
 | Jumpstart vs MSR-NAC | 27-67% | -2.4% (CDLL), -5.8% (ELLA) | not reproduced |
 | AoI from beta=0 to beta=1 | 38.58 -> 20.54 | 38.95 -> 16.13 | reproduced |
 | Win-win region beta in [0, 0.85] | AoI and energy both fall | energy rises | not reproduced |
@@ -96,4 +96,21 @@ Paper values are from Wu et al., IEEE TWC 2026.
 | Scaling 80 -> 280 IoTs | AoI +3%, energy/IoT -29% | AoI -10%, energy/IoT -10% | trend reproduced |
 | No catastrophic forgetting | qualitative | old-task change <= 0.01 | reproduced |
 
-Why the numbers differ, and the limitations of this study, are discussed in Chapter 8 of the report.
+## Cross-machine check
+
+The full suite was re-run on a Windows laptop (Python 3.12.4, NumPy 2.5.4) with the same config and seeds.
+The tables above are from the reference run (Linux, Python 3.13, NumPy 2.5.3).
+
+| End of training | All: Linux | All: Windows | D3: Linux | D3: Windows |
+|---|---|---|---|---|
+| MSR-NAC | 20.48 | 21.08 | 18.22 | 21.52 |
+| MSR-NAC-CDLL | 21.65 | 22.13 | 18.74 | 20.65 |
+| MSR-NAC-ELLA | 22.23 | 22.95 | 18.73 | 23.25 |
+| NAC | 22.51 | 22.51 | 19.89 | 19.69 |
+
+Stable across machines: overall ranking of MSR-NAC (best) and CDLL (second), domains 1, 2, 4, 5, 6, jumpstart,
+no forgetting. Not stable: domain 3 (MSR-NAC vs NAC reverses) and the convergence-speedup values for CDLL and
+ELLA. Tiny floating-point differences flip early sampled decisions; domain-3 task outcomes are very sensitive.
+Expect the same trends, not identical decimals, when you re-run.
+
+Why the numbers differ from the paper, and the limitations of this study, are discussed in Chapters 7-8 of the report.
