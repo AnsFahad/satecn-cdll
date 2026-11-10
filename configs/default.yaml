@@ -1,0 +1,97 @@
+# SATECN + CDLL reproduction config. Values marked [paper] come from Table IV / Sec. V-A;
+# values marked [assumed] are implementation decisions documented in README/report.
+
+seed: 2026
+
+area:
+  size_m: 1000.0            # [paper] 1000 x 1000 m terrestrial area
+  lat: 42.3732              # [assumed] ground site (UMass Amherst) for LEO geometry
+  lon: -72.5199
+
+sim:
+  slot_s: 1.0               # [paper] slot length 1 s
+  episode_slots: 120        # [paper] learning round 120-150 s -> one trajectory window
+  aoi_norm: 50.0            # [assumed] state normalisation of AoI
+  drem_norm_mb: 20.0        # [assumed] state normalisation of remaining data (MB)
+
+iot:
+  task_mb_mean: 1.2         # [paper] D_i ~ N(1.2, 0.6^2) MB
+  task_mb_std: 0.6
+  task_mb_min: 0.2          # [assumed] truncate the normal at 0.2 MB
+  per_task_cv: 0.1          # [assumed] D_i^v(t) ~ N(D_i, (0.1 D_i)^2) "sampled around D_i"
+  lambda_range: [6.0, 20.0] # [paper] tasks / s
+  lambda_scale: 0.05        # [assumed] rescale so offered load ~ service capacity (Fig. 8b regime); see README
+  rho_range: [180.0, 284.0] # [paper] cycles / bit
+  eps_max: 1.0e+9            # [paper] cycles / slot
+  alpha: 1.0e-25            # [paper] J / cycle^3
+  p_max_uav: 0.1            # [paper] W
+  p_max_leo: 2.0            # [paper] W
+  xi_cpt: 1.0               # [paper]
+  xi_tr: 1.0                # [assumed] not given in paper
+
+uav:
+  n: 2                      # [paper]
+  altitude_m: 30.0          # [paper]
+  eps_max: 2.0e+9            # [paper]
+  alpha: 1.0e-25            # [paper]
+  xi_cpt: 0.75              # [paper]
+  speed_mps: [5.0, 15.0]    # [assumed] random-waypoint speed
+  bandwidth_hz: 1.0e+6       # [paper]
+  carrier_hz: 2.0e+9         # [assumed]
+  eta_los_db: 1.0           # [assumed] excess loss, Zhu et al. [33]-style A2G model
+  eta_nlos_db: 20.0
+  env_a: 9.61               # [assumed] urban LoS-probability parameters
+  env_b: 0.16
+  noise_dbm_hz: -174.0
+  noise_figure_db: 10.0     # [assumed]
+
+leo:
+  n_sats: 18                # [paper]
+  use_tle: true
+  tle_file: data/starlink_screened.txt
+  window_start_utc: "2026-11-08T00:30:00"
+  window_s: 600             # [paper] 600 s screening window
+  min_elev_deg: 55.0        # [paper]
+  eps_max: 1.0e+10           # [paper]
+  alpha: 1.0e-28            # [paper]
+  xi_cpt: 0.6               # [paper]
+  bandwidth_hz: 1.0e+6       # [paper]
+  carrier_hz: 2.0e+9         # [assumed] S-band direct-to-device uplink
+  iot_gain_dbi: 0.0         # [assumed]
+  sat_gain_dbi: 22.0        # [assumed] calibrated to "hundreds of kbit/s to several Mbit/s"
+  noise_dbm_hz: -174.0
+  noise_figure_db: 3.0
+  rician_k: 10.0            # [assumed] small-scale fading H_{i,l}(t)
+
+objective:
+  beta: 0.8                 # [paper]
+  energy_scale: 1.0         # [assumed] epsilon in Eq. (15); not given in paper
+
+policy:
+  sigma: 0.5                # [assumed] exploration std of the logit-normal resource heads
+  init_scale: 1.0           # [assumed] theta ~ U(0, init_scale) for learning from scratch
+
+learner:
+  iterations: 200           # [paper] 200 training iterations
+  episodes_per_iter: 1      # trajectories per iteration (each episode = all IoTs of the task)
+  gamma: 1.0                # [assumed] undiscounted within the finite trajectory window
+  n_step: 40                # [assumed] MSR-NAC n-step horizon
+  step_size: 0.2            # [assumed] fixed-KL natural-gradient step
+  step_decay: 0.995
+  ridge: 1.0e-3
+
+lifelong:
+  d_base: 15                # [assumed] shared base dimension (= largest domain dimension)
+  h: 8                      # [assumed] number of latent components
+  eta_L: 0.5                # [assumed] relative step (x 1/Lipschitz bound) for Eq. (23)
+  eta_psi: 0.5              # [assumed] relative step for Eq. (24)
+  mu1: 0.01                 # l1 on s_k
+  mu2: 1.0e-3               # Frobenius on Psi_g
+  mu3: 1.0e-3               # Frobenius on L
+  kb_steps: 10              # gradient steps on (L, Psi) per task update
+  warm_start: true          # [assumed] new task s_k initialised from same-domain tasks (Alg. 1 uses rand)
+  hessian_reg: 1.0e-2
+
+tasks:
+  per_domain: 4             # [paper] tasks 1-24 from 6 domains
+  new_domain6: 4            # [paper] tasks 25-28 from domain 6

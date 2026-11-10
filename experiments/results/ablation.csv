@@ -1,0 +1,10 @@
+variant,mean_penalty,final_penalty
+n_step=1,22.527,23.754
+n_step=10,18.745,18.616
+n_step=40 (default),18.993,19.207
+n_step=120 (MC),18.929,18.671
+CDLL h=4,23.705,23.398
+CDLL h=8 (default),22.519,22.188
+CDLL h=15,22.746,22.962
+CDLL s_k=rand (Alg.1),22.619,21.770
+CDLL no refit,24.354,25.630

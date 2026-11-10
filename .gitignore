@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+experiments/checkpoints/
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+.vscode/
+.DS_Store

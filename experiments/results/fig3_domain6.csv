@@ -1,0 +1,6 @@
+algorithm,first5_iters,last10_iters,mean_200
+MSR-NAC-CDLL,21.40,19.60,20.02
+MSR-NAC-ELLA,19.93,18.22,18.78
+MSR-NAC,19.45,17.12,18.07
+NAC,19.67,19.83,19.74
+"Exhaustive search (grid, deterministic)",-,14.88,-
